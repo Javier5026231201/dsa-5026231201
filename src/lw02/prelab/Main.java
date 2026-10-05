@@ -9,16 +9,13 @@ import java.util.Stack;
 
 public class Main {
     public static void main(String[] args) {
-        // 1. LinkedList untuk menyimpan seluruh transaksi awal
-        LinkedList<String[]> rawTransactions = new LinkedList<>();
-
-        // 2. LinkedList untuk menyimpan data nasabah [Nama, Saldo]
+        Queue<String[]> transactionQueue = new LinkedList<>();
         LinkedList<String[]> customers = new LinkedList<>();
+        Stack<String[]> failedStack = new Stack<>();
 
-        // Pembacaan file transactions.txt
         File file = new File("src/lw02/prelab/transactions.txt");
         if (!file.exists()) {
-            file = new File("transactions.txt"); // Fallback jalur
+            file = new File("transactions.txt");
         }
 
         try (Scanner scanner = new Scanner(file)) {
@@ -27,10 +24,8 @@ public class Main {
                 String type = scanner.next();
                 String amount = scanner.next();
 
-                // Simpan transaksi
-                rawTransactions.add(new String[]{name, type, amount});
+                transactionQueue.add(new String[]{name, type, amount});
 
-                // Tambahkan nasabah jika pertama kali muncul (Order of First Appearance)
                 boolean exists = false;
                 for (String[] customer : customers) {
                     if (customer[0].equals(name)) {
@@ -47,23 +42,12 @@ public class Main {
             return;
         }
 
-        // 3. Pindahkan transaksi dari LinkedList ke Queue (FIFO)
-        Queue<String[]> transactionQueue = new LinkedList<>();
-        for (String[] tx : rawTransactions) {
-            transactionQueue.add(tx);
-        }
-
-        // 4. Stack untuk menyimpan transaksi gagal (LIFO)
-        Stack<String[]> failedStack = new Stack<>();
-
-        // Proses transaksi berurutan dari Queue
         while (!transactionQueue.isEmpty()) {
-            String[] tx = transactionQueue.poll(); // FIFO
+            String[] tx = transactionQueue.poll();
             String name = tx[0];
             String type = tx[1];
             int amount = Integer.parseInt(tx[2]);
 
-            // Cari data nasabah terkait
             String[] currentCustomer = null;
             for (String[] customer : customers) {
                 if (customer[0].equals(name)) {
@@ -80,7 +64,6 @@ public class Main {
                     currentCustomer[1] = String.valueOf(currentBalance);
                 } else if (type.equalsIgnoreCase("WITHDRAW")) {
                     if (amount > currentBalance) {
-                        // Penarikan gagal -> Push ke Stack
                         failedStack.push(tx);
                     } else {
                         currentBalance -= amount;
@@ -90,7 +73,6 @@ public class Main {
             }
         }
 
-        // 5. Cetak Output
         System.out.println("=== Final Balances ===");
         for (String[] customer : customers) {
             System.out.println(customer[0] + ": " + customer[1]);
@@ -98,7 +80,7 @@ public class Main {
 
         System.out.println("=== Failed Transactions ===");
         while (!failedStack.isEmpty()) {
-            String[] tx = failedStack.pop(); // LIFO
+            String[] tx = failedStack.pop();
             System.out.println(tx[0] + " " + tx[1] + " " + tx[2]);
         }
     }

@@ -82,8 +82,8 @@ public class Main {
         }
 
         System.out.println("=== Successfully Processed Requests ===");
-        for (String[] req : successfulRequests) {
-            System.out.println(req[0] + " " + req[1]);
+        for (String[] request : successfulRequests) {
+            System.out.println(request[0] + " " + request[1]);
         }
 
         System.out.println("=== Remaining Book Stock ===");
@@ -93,8 +93,8 @@ public class Main {
 
         System.out.println("=== Failed Requests ===");
         while (!failedStack.isEmpty()) {
-            String[] req = failedStack.pop();
-            System.out.println(req[0] + " " + req[1]);
+            String[] request = failedStack.pop();
+            System.out.println(request[0] + " " + request[1]);
         }
     }
 }
